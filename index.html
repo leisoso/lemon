@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lemon - 登录</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍋</text></svg>">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --blue:#1a73e8;--blue-hover:#1765cc;--blue-active:#185abc;--blue-light:#e8f0fe;
+  --green:#1e8e3e;--green-light:#e6f4ea;
+  --red:#d93025;--gray:#5f6368;--dark:#202124;--border:#dadce0;
+  --page:#f8f9fa;--card:#fff;
+  --shadow:0 1px 3px rgba(60,64,67,.15),0 1px 2px rgba(60,64,67,.1);
+  --shadow-lg:0 4px 16px rgba(0,0,0,.12);--radius:4px;
+}
+html,body{height:100%}
+body{font-family:'Google Sans',Roboto,Arial,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;color:var(--dark);background:var(--page);-webkit-font-smoothing:antialiased}
+.hidden{display:none!important}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+a{text-decoration:none;color:var(--blue);font-weight:500}
+a:hover{text-decoration:underline}
+input,select{font-family:inherit}
+
+/* ===== Logo ===== */
+.logo{display:flex;justify-content:center;font-weight:500;letter-spacing:.5px;user-select:none}
+.logo .c1{color:#4285f4}.logo .c2{color:#ea4335}.logo .c3{color:#fbbc05}.logo .c4{color:#4285f4}.logo .c5{color:#34a853}
+
+/* ===== 登录页 ===== */
+.auth-page{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 16px;background:#fff}
+.auth-card{width:100%;max-width:448px;padding:40px 40px 32px;border:1px solid var(--border);border-radius:8px;background:#fff}
+.auth-card .logo{font-size:34px;margin-bottom:16px}
+.auth-title{font-size:24px;font-weight:400;text-align:center;color:var(--dark)}
+.auth-subtitle{font-size:16px;font-weight:400;text-align:center;color:var(--gray);margin-top:8px}
+.field{margin-top:24px;position:relative}
+.field input{width:100%;height:54px;padding:0 16px;font-size:16px;border:1px solid var(--border);border-radius:var(--radius);outline:none;background:#fff;transition:border-color .15s,box-shadow .15s}
+.field input::placeholder{color:#9aa0a6}
+.field input:focus{border-color:var(--blue);box-shadow:0 0 0 1px var(--blue)}
+.field input.input-error{border-color:var(--red)}
+.field .error-msg{display:none;color:var(--red);font-size:12px;margin-top:8px;padding-left:16px}
+.field .error-msg.show{display:block}
+.field-row{display:flex;align-items:center;margin-top:12px}
+.checkbox{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--dark);cursor:pointer;user-select:none}
+.checkbox input{width:18px;height:18px;accent-color:var(--blue);cursor:pointer}
+.card-bottom{display:flex;justify-content:flex-end;align-items:center;margin-top:32px}
+.btn-primary{height:40px;padding:0 28px;background:var(--blue);color:#fff;font-size:15px;font-weight:500;border-radius:var(--radius);display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:background .15s,box-shadow .15s}
+.btn-primary:hover{background:var(--blue-hover);box-shadow:0 1px 2px rgba(0,0,0,.2)}
+.btn-primary:active{background:var(--blue-active)}
+.btn-primary:disabled{background:#a8c7fa;cursor:not-allowed;box-shadow:none}
+.spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,.45);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.auth-footer{display:flex;justify-content:space-between;align-items:center;width:100%;max-width:448px;margin-top:24px;font-size:12px;color:var(--gray)}
+.auth-footer select{border:none;background:none;color:var(--gray);font-size:12px;cursor:pointer;outline:none}
+.auth-footer .links a{color:var(--gray);font-weight:400;margin-left:24px}
+.auth-footer .links a:hover{color:var(--dark)}
+/* ===== 故事列表页 ===== */
+.stories-page{min-height:100vh;background:var(--page)}
+.topbar{background:#fff;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:10}
+.topbar-inner{max-width:880px;margin:0 auto;padding:0 24px;height:64px;display:flex;align-items:center;justify-content:space-between}
+.brand{display:flex;align-items:center;gap:10px;font-size:20px;font-weight:500}
+.brand .logo{font-size:20px;margin:0}
+.user{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--gray)}
+.avatar{width:32px;height:32px;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:500;font-size:15px;flex-shrink:0;text-transform:uppercase}
+.logout-btn{color:var(--gray);font-size:14px;font-weight:500;padding:8px 12px;border-radius:var(--radius)}
+.logout-btn:hover{background:var(--blue-light);color:var(--blue)}
+.container{max-width:880px;margin:0 auto;padding:32px 24px}
+.page-head{display:flex;align-items:baseline;gap:12px;margin-bottom:20px}
+.page-head h1{font-size:24px;font-weight:500}
+.count{font-size:14px;color:var(--gray)}
+.story-list{list-style:none;display:flex;flex-direction:column;gap:14px}
+.story-item{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:18px 20px;transition:box-shadow .15s}
+.story-item:hover{box-shadow:var(--shadow-lg)}
+.story-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
+.story-title{font-size:17px;font-weight:500;color:var(--dark)}
+.story-tag{flex-shrink:0;font-size:12px;padding:3px 10px;border-radius:999px;font-weight:500;white-space:nowrap}
+.story-tag.cn{background:var(--blue-light);color:var(--blue)}
+.story-tag.en{background:var(--green-light);color:var(--green)}
+.story-summary{font-size:14px;color:var(--gray);line-height:1.7}
+.pagination{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:32px;flex-wrap:wrap}
+.page-btn{min-width:36px;height:36px;padding:0 8px;border-radius:50%;font-size:14px;color:var(--gray);font-weight:500;display:flex;align-items:center;justify-content:center;transition:background .15s,color .15s}
+.page-btn:hover{background:#e8eaed}
+.page-btn.active{background:var(--blue);color:#fff}
+.page-btn:disabled{color:#c0c3c6;cursor:not-allowed;background:none}
+.page-ellipsis{color:var(--gray);padding:0 2px;user-select:none}
+.pagination-info{margin-top:16px;text-align:center;font-size:13px;color:var(--gray)}
+@media (max-width:560px){.auth-card{padding:24px 20px}.story-item{padding:14px 16px}}
+</style>
+</head>
+<body>
+<!-- ========== 登录页 ========== -->
+<section class="auth-page" id="login-page">
+  <div class="auth-card">
+    <div class="logo" aria-label="Lemon"><span class="c1">L</span><span class="c2">e</span><span class="c3">m</span><span class="c4">o</span><span class="c5">n</span></div>
+    <h1 class="auth-title">登录</h1>
+    <p class="auth-subtitle">登录后进入故事列表</p>
+
+    <form id="login-form" novalidate>
+      <div class="field">
+        <input type="text" id="username-input" placeholder="用户名（最多 20 位，仅字母和数字）" maxlength="20" autocomplete="username" inputmode="text">
+        <p class="error-msg" id="username-error"></p>
+      </div>
+      <div class="field">
+        <input type="password" id="password-input" placeholder="密码" autocomplete="current-password">
+        <p class="error-msg" id="password-error"></p>
+      </div>
+      <div class="field-row">
+        <label class="checkbox"><input type="checkbox" id="show-password"><span>显示密码</span></label>
+      </div>
+      <div class="card-bottom">
+        <button class="btn-primary" type="submit" id="btn-login">登录</button>
+      </div>
+    </form>
+  </div>
+
+  <footer class="auth-footer">
+    <select aria-label="选择语言">
+      <option>简体中文</option>
+      <option>English</option>
+      <option>日本語</option>
+    </select>
+    <div class="links">
+      <a href="#">帮助</a><a href="#">隐私</a><a href="#">条款</a>
+    </div>
+  </footer>
+</section>
+<!-- ========== 故事列表页 ========== -->
+<section class="stories-page hidden" id="stories-page">
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <span class="logo"><span class="c1">L</span><span class="c2">e</span><span class="c3">m</span><span class="c4">o</span><span class="c5">n</span></span>
+        <span>故事</span>
+      </div>
+      <div class="user">
+        <span class="avatar" id="user-avatar">U</span>
+        <span id="user-name">username</span>
+        <button class="logout-btn" id="logout-btn">退出</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="page-head">
+      <h1>全部故事</h1>
+      <span class="count" id="story-count"></span>
+    </div>
+    <ul class="story-list" id="story-list"></ul>
+    <nav class="pagination" id="pagination" aria-label="分页导航"></nav>
+    <p class="pagination-info" id="pagination-info"></p>
+  </main>
+</section>
+<script>
+(function () {
+  'use strict';
+
+  // ---------- 故事数据：中国传统故事 + 海外童话 ----------
+  var STORIES = [
+    { category: 'cn', title: '猴子捞月亮', summary: '一群猴子看到井里的月亮倒影，想把月亮捞上来，忙活半天却什么也没捞到，抬头才发现月亮仍挂在天上。' },
+    { category: 'cn', title: '精卫填海', summary: '炎帝的女儿精卫被大海吞没，化为小鸟，日复一日衔来石子和树枝，立志填平大海。' },
+    { category: 'cn', title: '夸父逐日', summary: '巨人夸父追赶太阳，渴死在路上，他的手杖化为桃林，为后来人遮阴解渴。' },
+    { category: 'cn', title: '女娲补天', summary: '天塌地陷之时，女娲炼五色石补天，斩鳌足立四极，让大地重归安宁。' },
+    { category: 'cn', title: '后羿射日', summary: '十个太阳同时炙烤大地，后羿张弓搭箭射落九个，只留下一个普照人间。' },
+    { category: 'cn', title: '愚公移山', summary: '年近九十的愚公决心搬走门前两座大山，相信子子孙孙代代相传，终能如愿。' },
+    { category: 'cn', title: '嫦娥奔月', summary: '嫦娥吞下仙药飞升月宫，从此与后羿天人永隔，只在月圆时遥望人间。' },
+    { category: 'cn', title: '牛郎织女', summary: '牛郎与织女相爱却被银河相隔，每年七夕，喜鹊搭桥让他们相会一次。' },
+    { category: 'cn', title: '白蛇传', summary: '白素贞与许仙在西湖相遇相爱，历经磨难，演绎一段流传千古的人妖之恋。' },
+    { category: 'cn', title: '孟姜女哭长城', summary: '孟姜女千里寻夫，得知丈夫已累死在长城下，悲恸的哭声震塌了八百里长城。' },
+    { category: 'cn', title: '盘古开天', summary: '盘古挥斧劈开混沌，顶天立地撑开天地，最终身体化为山川万物。' },
+    { category: 'cn', title: '大禹治水', summary: '大禹为治洪水三过家门而不入，改堵为疏，终使江河归流、百姓安居。' },
+    { category: 'en', title: '海的女儿', summary: '小美人鱼为爱舍弃鱼尾，忍受剧痛来到陆地，最终化为泡沫，化作永恒的灵魂。' },
+    { category: 'en', title: '丑小鸭', summary: '丑小鸭受尽嘲笑与冷落，历经寒冬磨难，最终蜕变成一只美丽的白天鹅。' },
+    { category: 'en', title: '白雪公主', summary: '白雪公主遭恶毒王后嫉妒，在七个小矮人的守护下，最终被王子的真爱唤醒。' },
+    { category: 'en', title: '灰姑娘', summary: '灰姑娘在仙女的帮助下参加王宫舞会，遗落的水晶鞋让她与王子重逢。' },
+    { category: 'en', title: '睡美人', summary: '被诅咒沉睡百年的公主，等待王子的真爱之吻打破魔咒，让王国重焕生机。' },
+    { category: 'en', title: '小红帽', summary: '小红帽去探望外婆，途中被大灰狼欺骗，最终在猎人的帮助下化险为夷。' },
+    { category: 'en', title: '卖火柴的小女孩', summary: '寒夜街头，小女孩点燃火柴，在温暖幻象中看见奶奶，最终安然睡去。' },
+    { category: 'en', title: '皇帝的新装', summary: '虚荣的皇帝穿上"不存在的新衣"游行，只有天真的孩子喊出了真相。' },
+    { category: 'en', title: '拇指姑娘', summary: '只有拇指大小的姑娘历经重重冒险，最终与花中王子一起飞向幸福。' },
+    { category: 'en', title: '青蛙王子', summary: '公主的亲吻打破了魔法，青蛙变回英俊的王子，两人从此幸福生活。' },
+    { category: 'en', title: '阿里巴巴与四十大盗', summary: '阿里巴巴用"芝麻开门"的咒语发现宝藏，凭借智慧战胜了四十大盗。' },
+    { category: 'en', title: '爱丽丝梦游仙境', summary: '爱丽丝掉进兔子洞，在奇幻的梦境世界里经历了一场奇妙的冒险。' }
+  ];
+
+  // ---------- DOM 引用 ----------
+  var loginPage = document.getElementById('login-page');
+  var storiesPage = document.getElementById('stories-page');
+  var loginForm = document.getElementById('login-form');
+  var usernameInput = document.getElementById('username-input');
+  var passwordInput = document.getElementById('password-input');
+  var usernameError = document.getElementById('username-error');
+  var passwordError = document.getElementById('password-error');
+  var showPassword = document.getElementById('show-password');
+  var btnLogin = document.getElementById('btn-login');
+  var userAvatar = document.getElementById('user-avatar');
+  var userName = document.getElementById('user-name');
+  var logoutBtn = document.getElementById('logout-btn');
+  var storyList = document.getElementById('story-list');
+  var paginationEl = document.getElementById('pagination');
+  var paginationInfo = document.getElementById('pagination-info');
+  var storyCount = document.getElementById('story-count');
+
+  var PAGE_SIZE = 10; // PRD：一页显示 10 个故事
+  var state = { username: '', page: 1 };
+
+  // ---------- 工具函数 ----------
+  function showFieldError(input, errorEl, msg) {
+    if (msg) {
+      input.classList.add('input-error');
+      errorEl.textContent = msg;
+      errorEl.classList.add('show');
+    } else {
+      input.classList.remove('input-error');
+      errorEl.textContent = '';
+      errorEl.classList.remove('show');
+    }
+  }
+
+  function setLoading(btn, loading) {
+    if (loading) {
+      btn.dataset.label = btn.textContent;
+      btn.innerHTML = '<span class="spinner"></span>';
+      btn.disabled = true;
+    } else {
+      btn.textContent = btn.dataset.label || '登录';
+      btn.disabled = false;
+    }
+  }
+
+  // ---------- 登录 ----------
+  loginForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var username = usernameInput.value.trim();
+    var password = passwordInput.value;
+
+    // 校验用户名：非空、仅字母数字、不超过 20 位
+    if (!username) { showFieldError(usernameInput, usernameError, '请输入用户名'); return; }
+    if (!/^[A-Za-z0-9]+$/.test(username)) { showFieldError(usernameInput, usernameError, '用户名只能包含字母和数字'); return; }
+    if (username.length > 20) { showFieldError(usernameInput, usernameError, '用户名最多 20 位'); return; }
+    showFieldError(usernameInput, usernameError, null);
+
+    // 校验密码：统一为 lemon
+    if (!password) { showFieldError(passwordInput, passwordError, '请输入密码'); return; }
+    if (password !== 'lemon') { showFieldError(passwordInput, passwordError, '密码错误'); return; }
+    showFieldError(passwordInput, passwordError, null);
+
+    state.username = username;
+    setLoading(btnLogin, true);
+    setTimeout(function () {
+      setLoading(btnLogin, false);
+      enterApp();
+    }, 600);
+  });
+
+  showPassword.addEventListener('change', function () {
+    passwordInput.type = showPassword.checked ? 'text' : 'password';
+  });
+
+  function enterApp() {
+    userAvatar.textContent = state.username.charAt(0);
+    userName.textContent = state.username;
+    loginPage.classList.add('hidden');
+    storiesPage.classList.remove('hidden');
+    state.page = 1;
+    renderStories();
+    renderPagination();
+    window.scrollTo(0, 0);
+  }
+
+  logoutBtn.addEventListener('click', function () {
+    storiesPage.classList.add('hidden');
+    loginPage.classList.remove('hidden');
+    passwordInput.value = '';
+    showPassword.checked = false;
+    passwordInput.type = 'password';
+    showFieldError(usernameInput, usernameError, null);
+    showFieldError(passwordInput, passwordError, null);
+    usernameInput.focus();
+  });
+
+  // ---------- 故事列表 ----------
+  function renderStories() {
+    var start = (state.page - 1) * PAGE_SIZE;
+    var items = STORIES.slice(start, start + PAGE_SIZE);
+    storyList.innerHTML = items.map(function (s) {
+      var tagText = s.category === 'cn' ? '中国传统故事' : '海外童话';
+      return '<li class="story-item">' +
+        '<div class="story-head">' +
+          '<h3 class="story-title">' + s.title + '</h3>' +
+          '<span class="story-tag ' + s.category + '">' + tagText + '</span>' +
+        '</div>' +
+        '<p class="story-summary">' + s.summary + '</p>' +
+      '</li>';
+    }).join('');
+    storyCount.textContent = '共 ' + STORIES.length + ' 个故事';
+  }
+
+  function getPageList(current, total) {
+    if (total <= 7) {
+      var all = [];
+      for (var i = 1; i <= total; i++) all.push(i);
+      return all;
+    }
+    var pages = [1];
+    if (current > 3) pages.push('…');
+    var s = Math.max(2, current - 1);
+    var e = Math.min(total - 1, current + 1);
+    for (var j = s; j <= e; j++) pages.push(j);
+    if (current < total - 2) pages.push('…');
+    pages.push(total);
+    return pages;
+  }
+
+  function renderPagination() {
+    var total = Math.ceil(STORIES.length / PAGE_SIZE);
+    var list = getPageList(state.page, total);
+    var html = '<button class="page-btn" data-page="' + (state.page - 1) + '"' + (state.page === 1 ? ' disabled' : '') + ' aria-label="上一页">‹</button>';
+    list.forEach(function (p) {
+      if (p === '…') {
+        html += '<span class="page-ellipsis">…</span>';
+      } else {
+        html += '<button class="page-btn' + (p === state.page ? ' active' : '') + '" data-page="' + p + '">' + p + '</button>';
+      }
+    });
+    html += '<button class="page-btn" data-page="' + (state.page + 1) + '"' + (state.page === total ? ' disabled' : '') + ' aria-label="下一页">›</button>';
+    paginationEl.innerHTML = html;
+    paginationInfo.textContent = '第 ' + state.page + ' 页 · 共 ' + total + ' 页 · 每页 ' + PAGE_SIZE + ' 个故事';
+  }
+
+  paginationEl.addEventListener('click', function (e) {
+    var btn = e.target.closest('.page-btn');
+    if (!btn || btn.disabled) return;
+    goToPage(parseInt(btn.dataset.page, 10));
+  });
+
+  function goToPage(p) {
+    var total = Math.ceil(STORIES.length / PAGE_SIZE);
+    if (p < 1 || p > total) return;
+    state.page = p;
+    renderStories();
+    renderPagination();
+    var top = document.querySelector('.container');
+    if (top) top.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // ---------- 初始化 ----------
+  renderStories();
+  renderPagination();
+})();
+</script>
+</body>
+</html>
